@@ -70,18 +70,16 @@ public class AdministratorController {
 	 */
 	@RequestMapping("/insert")
 	public String insert(@Validated InsertAdministratorForm form, BindingResult result) {
-		// 入力値エラーとなった場合は登録画面へ遷移
-		if (result.hasErrors()) {
-			return toInsert();
-		}
-		// メールアドレスから管理者情報を取得できる場合は登録画面へ遷移
+		// メールアドレスから管理者情報を取得できる場合はエラーセット
 		if (administratorService.findByMailAddress(form.getMailAddress()) != null) {
 			result.addError(new FieldError(result.getObjectName(), "mailAddress", "メールアドレスが既に登録されています"));
-			return toInsert();
 		}
-		// パスワードと確認用パスワードが異なる場合は登録画面へ遷移
+		// パスワードと確認用パスワードが異なる場合はエラーセット
 		if (!(form.getPassword().equals(form.getPasswordConfirmation()))) {
 			result.addError(new FieldError(result.getObjectName(), "passwordConfirmation", "確認用パスワードが相違しています"));
+		}
+		// エラーがある場合は登録画面へ遷移
+		if (result.hasErrors()) {
 			return toInsert();
 		}
 		Administrator administrator = new Administrator();
