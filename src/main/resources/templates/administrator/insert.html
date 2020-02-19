@@ -38,6 +38,7 @@
 							<div class="form-group">
 								<div class="row">
 									<div class="col-sm-12">
+										<div th:if="${mail_check_message}" th:text="${mail_check_message}" style="color:red;">メールアドレスが重複しています</div>
 										<label for="name">
 											氏名:
 										</label>

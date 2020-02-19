@@ -68,9 +68,14 @@ public class AdministratorController {
 	 * @return ログイン画面へリダイレクト
 	 */
 	@RequestMapping("/insert")
-	public String insert(@Validated InsertAdministratorForm form, BindingResult result) {
+	public String insert(@Validated InsertAdministratorForm form, BindingResult result, Model model) {
 		//入力値エラーとなった場合は登録画面へ遷移
 		if(result.hasErrors()) {
+			return toInsert();
+		}
+		//メールアドレスから管理者情報を取得できる場合は登録画面へ遷移
+		if(administratorService.findByMailAddress(form.getMailAddress()) != null) {
+			model.addAttribute("mail_check_message", "メールアドレスが既に登録されています");
 			return toInsert();
 		}
 		Administrator administrator = new Administrator();
