@@ -63,7 +63,18 @@
 <!-- ここから上を編集する必要はありません -->
 
 <!-- ここにモックのtable要素を貼り付けます -->
-
+				<!-- 従業員検索用フォーム -->
+				<form th:action="@{/employee/search-by-name}" method="post">
+					<div class="form-group">
+						<div class="alert alert-danger" th:if="${searchErrorMessage}">
+			                 <p th:text="${searchErrorMessage}">1件もありませんでした</p>
+			            </div>
+			        </div>
+			        <div>
+						<label for="name">従業員名:</label><span><button type="submit" class="btn btn-primary" style="padding:3px 9px;margin:10px;">検索</button></span>
+						<input type="text" name="employeeName" id="employeeName" class="form-control" placeholder="従業員検索">
+					</div>
+				</form>
 				<table class="table table-striped">
 					<thead>
 						<tr>
