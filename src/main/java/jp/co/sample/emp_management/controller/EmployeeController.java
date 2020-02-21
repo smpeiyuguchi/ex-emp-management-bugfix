@@ -1,7 +1,13 @@
 package jp.co.sample.emp_management.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.Date;
 import java.util.List;
 
+//import javax.servlet.ServletContext;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jp.co.sample.emp_management.domain.Employee;
+import jp.co.sample.emp_management.form.InsertEmployeeForm;
 import jp.co.sample.emp_management.form.UpdateEmployeeForm;
 import jp.co.sample.emp_management.service.EmployeeService;
 
@@ -24,6 +31,9 @@ import jp.co.sample.emp_management.service.EmployeeService;
 @RequestMapping("/employee")
 public class EmployeeController {
 
+//	@Autowired
+//	private ServletContext application;
+
 	@Autowired
 	private EmployeeService employeeService;
 
@@ -35,6 +45,11 @@ public class EmployeeController {
 	@ModelAttribute
 	public UpdateEmployeeForm setUpForm() {
 		return new UpdateEmployeeForm();
+	}
+
+	@ModelAttribute
+	public InsertEmployeeForm setUpInsertEmployeeForm() {
+		return new InsertEmployeeForm();
 	}
 
 	/////////////////////////////////////////////////////
@@ -112,4 +127,55 @@ public class EmployeeController {
 		model.addAttribute("employeeList", employeeList);
 		return "employee/list";
 	}
+
+	/**
+	 * 従業員登録画面を出力します.
+	 * 
+	 * @return 従業員登録画面
+	 */
+	@RequestMapping("/to-register")
+	public String toRegister(Model model) {
+		return "employee/register";
+	}
+
+	/**
+	 * 従業員情報を登録します.
+	 * 
+	 * @param model リクエストスコープ
+	 * @param form  従業員情報登録用フォーム
+	 * @return 従業員一覧画面
+	 */
+	@RequestMapping("/register")
+	public String register(Model model, InsertEmployeeForm form) {
+		Employee employee = new Employee();
+		BeanUtils.copyProperties(form, employee);
+		employee.setHireDate(Date.valueOf(form.getHireDate()));
+		File file = new File ("/Users/shumpei/Documents/workspace-spring-tool-suite-4-4.5.0.RELEASE/"
+				+ "ex-emp-management-bugfix/src/main/resources/static/img/" + form.getImage().getOriginalFilename());
+//		String path = (application.getRealPath("/") + "img/" + form.getImage().getOriginalFilename());
+//		Path path = Paths.get(System.getProperty("java.io.tmpdir"), form.getImage().getOriginalFilename());
+//		System.out.println("path=" + System.getProperty("java.io.tmpdir"));
+//		System.out.println(path);
+		try {
+//			form.getImage().transferTo(path.toFile());
+			form.getImage().transferTo(file);
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		;
+
+		employee.setImage(form.getImage().getOriginalFilename());
+		employeeService.register(employee);
+		return showList(model);
+	}
+
+//	@RequestMapping("/test")
+//	public String test(Model model) {
+//		String path = application.getServletcontext;
+//		System.out.println("path" + path);
+//		return "employee/register";
+//	}
+
 }

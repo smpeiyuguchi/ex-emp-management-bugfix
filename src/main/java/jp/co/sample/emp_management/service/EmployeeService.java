@@ -53,8 +53,24 @@ public class EmployeeService {
 		employeeRepository.update(employee);
 	}
 
+	/**
+	 * 名前から従業員名を検索します.
+	 * 
+	 * @param employeeName 従業員名
+	 * @return 従業員情報一覧
+	 */
 	public List<Employee> searchByName(String employeeName) {
 		List<Employee> employeeList = employeeRepository.findByName(employeeName);
 		return employeeList;
 	}
+	
+	/**
+	 * 従業員情報を登録します.
+	 * 
+	 * @param employee 登録する従業員情報
+	 */
+	public void register(Employee employee) {
+		employeeRepository.insert(employee);
+	}
+	
 }

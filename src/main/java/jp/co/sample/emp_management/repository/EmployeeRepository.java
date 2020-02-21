@@ -83,7 +83,7 @@ public class EmployeeRepository {
 		String updateSql = "UPDATE employees SET dependents_count=:dependentsCount WHERE id=:id";
 		template.update(updateSql, param);
 	}
-	
+
 	/**
 	 * 名前から曖昧検索をして従業員一覧を取得します.
 	 * 
@@ -93,10 +93,30 @@ public class EmployeeRepository {
 	public List<Employee> findByName(String employeeName) {
 		String sql = "SELECT id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,"
 				+ "dependents_count FROM employees WHERE name LIKE :name ORDER BY hire_date DESC";
-		
+
 		SqlParameterSource param = new MapSqlParameterSource().addValue("name", "%" + employeeName + "%");
 		List<Employee> employeeList = template.query(sql, param, EMPLOYEE_ROW_MAPPER);
 		System.out.println(employeeList);
 		return employeeList;
+	}
+
+	/**
+	 * 従業員情報を登録します.
+	 * 
+	 * @param employee 従業員情報
+	 */
+	synchronized public void insert(Employee e) {
+		// SqlParameterSource param = new BeanPropertySqlParameterSource(employee);
+		String sql = "INSERT INTO employees (id,name,image,gender,hire_date,mail_address,zip_code,"
+				+ "address,telephone,salary,characteristics,dependents_count) "
+				+ "SELECT MAX(id)+1,:name,:image,:gender,:hireDate,:mailAddress,:zipCode,"
+				+ ":address,:telephone,:salary,:characteristics,:dependentsCount FROM employees";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("name", e.getName())
+				.addValue("image", e.getImage()).addValue("gender", e.getGender()).addValue("hireDate", e.getHireDate())
+				.addValue("mailAddress", e.getMailAddress()).addValue("zipCode", e.getZipCode())
+				.addValue("address", e.getAddress()).addValue("telephone", e.getTelephone())
+				.addValue("salary", e.getSalary()).addValue("characteristics", e.getCharacteristics())
+				.addValue("dependentsCount", e.getDependentsCount());
+		template.update(sql, param);
 	}
 }
