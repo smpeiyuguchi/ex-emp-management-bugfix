@@ -116,13 +116,10 @@ public class EmployeeController {
 	 */
 	@RequestMapping("/search-by-name")
 	public String searchByName(Model model, String employeeName) {
-		if (employeeName == null) {
-			return showList(model);
-		}
 		List<Employee> employeeList = employeeService.searchByName(employeeName);
 		if (employeeList.size() == 0) {
-			employeeList = employeeService.showList();
 			model.addAttribute("searchErrorMessage", "1件もありませんでした");
+			return showList(model);
 		}
 		model.addAttribute("employeeList", employeeList);
 		return "employee/list";
