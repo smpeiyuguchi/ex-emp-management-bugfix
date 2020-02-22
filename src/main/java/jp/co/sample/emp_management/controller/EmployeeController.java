@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jp.co.sample.emp_management.domain.Employee;
+import jp.co.sample.emp_management.domain.LoginAdministrator;
 import jp.co.sample.emp_management.form.InsertEmployeeForm;
 import jp.co.sample.emp_management.form.UpdateEmployeeForm;
 import jp.co.sample.emp_management.service.EmployeeService;
@@ -62,7 +64,8 @@ public class EmployeeController {
 	 * @return 従業員一覧画面
 	 */
 	@RequestMapping("/showList")
-	public String showList(Model model) {
+	// ログインした管理者を受け取る
+	public String showList(Model model, @AuthenticationPrincipal LoginAdministrator loginAdministrator) {
 		List<Employee> employeeList = employeeService.showList();
 		model.addAttribute("employeeList", employeeList);
 		return "employee/list";
@@ -115,11 +118,12 @@ public class EmployeeController {
 	 * 
 	 */
 	@RequestMapping("/search-by-name")
-	public String searchByName(Model model, String employeeName) {
+	public String searchByName(Model model, String employeeName,
+			@AuthenticationPrincipal LoginAdministrator loginAdministrator) {
 		List<Employee> employeeList = employeeService.searchByName(employeeName);
 		if (employeeList.size() == 0) {
 			model.addAttribute("searchErrorMessage", "1件もありませんでした");
-			return showList(model);
+			return showList(model, loginAdministrator);
 		}
 		model.addAttribute("employeeList", employeeList);
 		return "employee/list";
@@ -147,7 +151,7 @@ public class EmployeeController {
 		Employee employee = new Employee();
 		BeanUtils.copyProperties(form, employee);
 		employee.setHireDate(Date.valueOf(form.getHireDate()));
-		File file = new File ("/Users/shumpei/Documents/workspace-spring-tool-suite-4-4.5.0.RELEASE/"
+		File file = new File("/Users/shumpei/Documents/workspace-spring-tool-suite-4-4.5.0.RELEASE/"
 				+ "ex-emp-management-bugfix/src/main/resources/static/img/" + form.getImage().getOriginalFilename());
 //		String path = (application.getRealPath("/") + "img/" + form.getImage().getOriginalFilename());
 //		Path path = Paths.get(System.getProperty("java.io.tmpdir"), form.getImage().getOriginalFilename());
@@ -165,7 +169,7 @@ public class EmployeeController {
 
 		employee.setImage(form.getImage().getOriginalFilename());
 		employeeService.register(employee);
-		return showList(model);
+		return "redirect:/employee/showList";
 	}
 
 //	@RequestMapping("/test")
